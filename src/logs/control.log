@@ -1,0 +1,424 @@
+[INFO] [launch]: All log files can be found below /root/.ros/log/2026-05-05-09-32-22-760385-aa7015a94ca9-4081464
+[INFO] [launch]: Default logging verbosity is set to INFO
+-----------------------------------------------------------------------------
+[Main Controller] Begin to execute, and the current time is: 2026/05/05/ 09:32:22 Tuesday
+-----------------------------------------------------------------------------
+[Quadruped] Legged Robots Control Software
+        Quadruped: Cyberdog2
+        Driver: Development Simulation Driver
+        Parameters Source: Load parameters from network
+[Shared Memory] open existing development-simulator size 3093952 bytes
+[Simulation Driver] Starting main loop...
+Response(1) set robot s64 cheater_mode robot to: 0
+Response(2) set robot double complementaryfilter_source robot to: 1
+Response(3) set robot s64 control_mode robot to: 0
+Response(4) set robot double controller_dt robot to: 0.002
+Response(5) set robot double delt_pitch robot to: 0
+Response(6) set robot double delt_roll robot to: 0
+Response(7) set robot s64 filter_type robot to: 0
+Response(8) set robot double foot_height_sensor_noise robot to: 0.001
+Response(9) set robot double foot_process_noise_position robot to: 0.002
+Response(10) set robot double foot_sensor_noise_position robot to: 0.001
+Response(11) set robot double foot_sensor_noise_velocity robot to: 0.05
+Response(12) set robot double gain_acc robot to: 0.001
+Response(13) set robot s64 gait_id robot to: 9
+Response(14) set robot s64 imu_adaptive_gain robot to: 1
+Response(15) set robot s64 imu_bias_estimation robot to: 0
+Response(16) set robot double imu_process_noise_position robot to: 0.02
+Response(17) set robot double imu_process_noise_velocity robot to: 0.02
+Response(18) set robot s64 lcm_debug_switch robot to: 0
+Response(19) set robot vecXd se_ori_cali_gain robot to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(20) set robot vecXd se_ori_cali_offset robot to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(21) set robot vecXd speed_offset_ballet robot to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(22) set robot vecXd speed_offset_bound robot to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(23) set robot vecXd speed_offset_pronk robot to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(24) set robot vecXd speed_offset_trot_10_4 robot to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(25) set robot vecXd speed_offset_trot_24_16 robot to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(26) set robot vecXd speed_offset_trot_8_3 robot to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(27) set robot vecXd speed_offset_trot_fast robot to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(28) set robot vecXd speed_offset_trot_follow robot to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(29) set robot vecXd speed_offset_trot_medium robot to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(30) set robot vecXd speed_offset_trot_slow robot to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(31) set robot s64 use_rc robot to: 1
+Response(32) set user vecXd acc_xy_yaw_max user to: [1, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(33) set user vecXd acc_xy_yaw_max_bound user to: [1.7, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(34) set user vecXd acc_xy_yaw_max_follow user to: [1, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(35) set user vecXd acc_xy_yaw_max_pronk_rl user to: [1.5, 1.5, 2.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(36) set user vecXd acc_xy_yaw_max_rapid_rl user to: [0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(37) set user vecXd acc_xy_yaw_min user to: [-2, -1, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(38) set user vecXd acc_xy_yaw_min_bound user to: [-2, -3, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(39) set user vecXd acc_xy_yaw_min_follow user to: [-5, -1, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(40) set user vecXd acc_xy_yaw_min_pronk_rl user to: [-1.5, -1.5, -2.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(41) set user vecXd acc_xy_yaw_min_rapid_rl user to: [0, 0, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(42) set user double action_pause user to: 0
+Response(43) set user double auto_switch_enabled user to: 1
+Response(44) set user double ballet_height user to: 0.04
+Response(45) set user vecXd ballet_landing_offset user to: [-0.06, -0.1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(46) set user double ballet_step_height user to: 0.01
+Response(47) set user double ballet_trans_step_height user to: 0.02
+Response(48) set user double body_size_port user to: 1
+Response(49) set user double centrifugal_thresh user to: 0.3
+Response(50) set user double cmpc_bonus_swing user to: 0.05
+Response(51) set user double cmpc_bonus_swing_follow user to: 0.3
+Response(52) set user double cmpc_bonus_swing_large user to: 0.05
+Response(53) set user double cmpc_x_drag user to: 3
+Response(54) set user vecXd contact_threshold user to: [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(55) set user vecXd des_roll_pitch_height user to: [0, 0, 0.25, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(56) set user vecXd des_roll_pitch_height_motion user to: [0, 0, 0.225, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(57) set user vecXd des_roll_pitch_height_stair user to: [0, 0, 0.225, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(58) set user vecXd des_vel user to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(59) set user double detect_terrain user to: 1
+Response(60) set user vecXd diagonal_landing_offset user to: [0.03, 0.02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(61) set user vecXd diagonal_yaw_rate user to: [0, -0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(62) set user double disable_push_recovery_delay user to: 250
+Response(63) set user vecXd disable_push_recovery_vel_stand user to: [0.1, 0.1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(64) set user vecXd disable_push_recovery_vel_trot user to: [0.06, 0.06, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(65) set user double downstairs_depth user to: -0.075
+Response(66) set user double downstairs_height_cmd user to: 0.2
+Response(67) set user double enable_push_recovery_delay user to: 500
+Response(68) set user vecXd enable_push_recovery_pos_stand user to: [0.015, 0.018, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(69) set user vecXd enable_push_recovery_vel_stand user to: [0.37, 0.29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(70) set user vecXd enable_push_recovery_vel_trot user to: [0.4, 0.27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(71) set user double foot_final_height user to: -0.005
+Response(72) set user vecXd front_lift_height_pitch user to: [0.01, -0.05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(73) set user vecXd front_lift_landing_offset user to: [-0.01, 0.03, -0.02, 0.03, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(74) set user vecXd front_lift_switch_landing_offset user to: [0, -0.05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(75) set user vecXd front_lift_switch_middle_pos user to: [0, 0.05, 0.06, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(76) set user double gait_max_leg_angle user to: 15
+Response(77) set user double gait_max_stance_time user to: 0.25
+Response(78) set user double gait_min_stance_time user to: 0.1
+Response(79) set user double gait_override user to: 4
+Response(80) set user double gait_period_time user to: 0.5
+Response(81) set user double gait_switching_phase user to: 0.5
+Response(82) set user double gait_type user to: 4
+Response(83) set user double jcqp_alpha user to: 1.5
+Response(84) set user double jcqp_max_iter user to: 10000
+Response(85) set user double jcqp_rho user to: 1e-07
+Response(86) set user double jcqp_sigma user to: 1e-08
+Response(87) set user double jcqp_terminate user to: 0.1
+Response(88) set user vecXd jump_action_order user to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(89) set user double jump_force user to: 30
+Response(90) set user vecXd jump_front_hip user to: [-1.5, -1.6, -1.5, -1.3, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(91) set user vecXd jump_front_knee user to: [2.4, 2, 2.4, 1.6, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(92) set user vecXd jump_height user to: [-0, -0.28, 0.1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(93) set user vecXd jump_hind_hip user to: [-1.3, -1.4, -1.6, -1.7, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(94) set user vecXd jump_hind_knee user to: [2, 0.5, 2.4, 2.1, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(95) set user vecXd jump_initial_pos user to: [0, -0, 0.28, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(96) set user vecXd jump_qkd user to: [5, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(97) set user vecXd jump_qkp user to: [50, 80, 80, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(98) set user vecXd jump_rot user to: [0, 0.4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(99) set user vecXd jump_time_vector user to: [1, 1.3, 1.31, 1.4, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(100) set user vecXd jump_vel user to: [0, 0, 1.6, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(101) set user double knee_angle_adj user to: 3
+Response(102) set user vecXd moonwalk_landing_offset user to: [0.065, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(103) set user vecXd moonwalk_step_height user to: [0.05, 0.015, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(104) set user double motor_sdk_position_mutation_limit user to: 1
+Response(105) set user vecXd mpc_body_inertia user to: [0.07641, 0.17843, 0.197579, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(106) set user double mpc_body_mass user to: 8.3644
+Response(107) set user vecXd mpc_com_offset user to: [0.027, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(108) set user double mpc_force_max user to: 150
+Response(109) set user double mpc_friction_coef user to: 0.4
+Response(110) set user double mpc_friction_coef_bound user to: 0.3
+Response(111) set user double mpc_friction_coef_follow user to: 0.5
+Response(112) set user vecXd mpc_only_joint_kd user to: [0.2, 0.2, 0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(113) set user vecXd mpc_only_stance_cartesian_kd user to: [14, 14, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(114) set user vecXd mpc_only_stance_cartesian_kp user to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(115) set user vecXd mpc_only_swing_cartesian_kd user to: [14, 14, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(116) set user vecXd mpc_only_swing_cartesian_kp user to: [700, 700, 700, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(117) set user vecXd mpc_task_weight user to: [1.25, 1.25, 2, 2, 2, 50, 0, 0, 0.3, 1.5, 1.5, 0.2]
+Response(118) set user double mpc_use_bezier user to: 1
+Response(119) set user double mpc_velocity_filter user to: 0.01
+Response(120) set user vecXd mpc_wbc_stance_cartesian_kd user to: [4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(121) set user vecXd mpc_wbc_stance_cartesian_kp user to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(122) set user vecXd pace_stride_landing_offset_y user to: [0.02, -0.02, 0.02, -0.02, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(123) set user vecXd pace_stride_vel_cmd user to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(124) set user vecXd pitch_step_height user to: [-0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(125) set user vecXd pitch_step_landing_offset user to: [0.06, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(126) set user vecXd pitch_step_pitch user to: [0.12, -0.12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(127) set user double push_recovery_enabled user to: 1
+Response(128) set user double rc_delta_step_height user to: 0.075
+Response(129) set user vecXd rear_lift_height_pitch user to: [0.01, 0.05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(130) set user vecXd rear_lift_landing_offset user to: [0.01, 0.03, -0.02, 0.03, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(131) set user vecXd rear_lift_switch_landing_offset user to: [0, -0.05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(132) set user vecXd rear_lift_switch_middle_pos user to: [0, 0.05, 0.06, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(133) set user vecXd rpy_acc_max user to: [10, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(134) set user vecXd rpy_max user to: [0.47, 0.3, 0.65, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(135) set user vecXd rpy_min user to: [-0.47, -0.25, -0.65, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(136) set user vecXd rpy_w_max user to: [2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(137) set user vecXd skateboard_body_pos_balance user to: [0, 0, 0.18, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(138) set user vecXd skateboard_body_pos_skate user to: [0.06, 0.02, 0.125, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(139) set user vecXd skateboard_body_pos_swing_in_skate user to: [0, 0.02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(140) set user vecXd skateboard_foot_swing_final_offset user to: [0, 0.15, 0.018, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(141) set user double skateboard_height user to: 0.085
+Response(142) set user vecXd skateboard_thrust_force user to: [18, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(143) set user vecXd skateboard_thrust_force_first user to: [18, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(144) set user vecXd skateboard_velocity user to: [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(145) set user double special_pronk_height user to: 0.025
+Response(146) set user double special_pronk_size user to: 0.025
+Response(147) set user vecXd special_trot_landing_offset user to: [0.03, 0.03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(148) set user double stance_legs user to: 4
+Response(149) set user double step_height_max user to: 0.06
+Response(150) set user vecXd swing_p_gain user to: [0.06, 0.05, 0.03, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(151) set user vecXd swing_p_gain_follow user to: [0.3, 0.05, 0.03, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(152) set user vecXd swing_p_gain_large user to: [0.06, 0.05, 0.03, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(153) set user vecXd swing_p_gain_motion user to: [0.06, 0.05, 0.03, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(154) set user vecXd trot_in_out_landing_offset user to: [0.05, 0.06, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(155) set user vecXd trot_pitch_landing_offset user to: [-0.05, 0.1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(156) set user vecXd trot_pitch_up_down user to: [0.15, -0.15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(157) set user vecXd trot_swing_middle_pos user to: [0, 0.05, 0.05, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(158) set user double upstairs_height_cmd user to: 0.24
+Response(159) set user double use_energy_saving_mode user to: 1
+Response(160) set user double use_jcqp user to: 0
+Response(161) set user double use_wbc user to: 1
+Response(162) set user vecXd vel_max_ratio user to: [1.2, 1.05, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(163) set user double vel_scale_limit_type user to: 0
+Response(164) set user vecXd vel_switch user to: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1, 1, 0.05]
+Response(165) set user vecXd vel_xy_yaw_max_bound user to: [0.3, 0.3, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(166) set user vecXd vel_xy_yaw_max_default user to: [2, 1, 2.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(167) set user vecXd vel_xy_yaw_max_motion_default user to: [1.5, 0.3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(168) set user vecXd vel_xy_yaw_max_passive_trot user to: [1.2, 0.4, 0.8, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(169) set user vecXd vel_xy_yaw_max_pronk user to: [0.19, 0.4, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(170) set user vecXd vel_xy_yaw_max_pronk_rl user to: [1.6, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(171) set user vecXd vel_xy_yaw_max_rapid_rl user to: [0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(172) set user vecXd vel_xy_yaw_max_stair user to: [2, 1, 2.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(173) set user vecXd vel_xy_yaw_max_trot_10_4 user to: [1.6, 0.55, 2.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(174) set user vecXd vel_xy_yaw_max_trot_10_5 user to: [1.4, 0.5, 2.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(175) set user vecXd vel_xy_yaw_max_trot_12_6 user to: [0.8, 0.4, 2.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(176) set user vecXd vel_xy_yaw_max_trot_14_8 user to: [0.55, 0.32, 2.3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(177) set user vecXd vel_xy_yaw_max_trot_16_10 user to: [0.4, 0.26, 2.1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(178) set user vecXd vel_xy_yaw_max_trot_18_11 user to: [0.35, 0.21, 1.9, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(179) set user vecXd vel_xy_yaw_max_trot_20_12 user to: [0.3, 0.19, 1.7, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(180) set user vecXd vel_xy_yaw_max_trot_22_14 user to: [0.25, 0.17, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(181) set user vecXd vel_xy_yaw_max_trot_24_16 user to: [0.2, 0.15, 1.3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(182) set user vecXd vel_xy_yaw_max_trot_8_3 user to: [1.6, 0.6, 2.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(183) set user vecXd vel_xy_yaw_max_trot_fast user to: [1.6, 0.55, 2.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(184) set user vecXd vel_xy_yaw_max_trot_medium user to: [1.2, 0.4, 2.25, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(185) set user vecXd vel_xy_yaw_max_trot_slow user to: [0.6, 0.2, 1.3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(186) set user vecXd vel_xy_yaw_max_vision user to: [0.5, 0.3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(187) set user vecXd vel_xy_yaw_max_walk user to: [0.2, 0.1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(188) set user vecXd vel_xy_yaw_min_bound user to: [-0.3, -0.3, -1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(189) set user vecXd vel_xy_yaw_min_default user to: [-2, -1, -2.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(190) set user vecXd vel_xy_yaw_min_motion_default user to: [-1.5, -0.3, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(191) set user vecXd vel_xy_yaw_min_passive_trot user to: [-1.2, -0.4, -0.8, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(192) set user vecXd vel_xy_yaw_min_pronk user to: [-0.22, -0.4, -1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(193) set user vecXd vel_xy_yaw_min_pronk_rl user to: [-1.2, -1, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(194) set user vecXd vel_xy_yaw_min_rapid_rl user to: [0, 0, -8, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(195) set user vecXd vel_xy_yaw_min_stair user to: [-2, -1, -2.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(196) set user vecXd vel_xy_yaw_min_trot_10_4 user to: [-1.2, -0.55, -2.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(197) set user vecXd vel_xy_yaw_min_trot_10_5 user to: [-1.2, -0.5, -2.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(198) set user vecXd vel_xy_yaw_min_trot_12_6 user to: [-0.8, -0.4, -2.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(199) set user vecXd vel_xy_yaw_min_trot_14_8 user to: [-0.55, -0.32, -2.3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(200) set user vecXd vel_xy_yaw_min_trot_16_10 user to: [-0.4, -0.26, -2.1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(201) set user vecXd vel_xy_yaw_min_trot_18_11 user to: [-0.35, -0.21, -1.9, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(202) set user vecXd vel_xy_yaw_min_trot_20_12 user to: [-0.3, -0.19, -1.7, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(203) set user vecXd vel_xy_yaw_min_trot_22_14 user to: [-0.25, -0.17, -1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(204) set user vecXd vel_xy_yaw_min_trot_24_16 user to: [-0.2, -0.15, -1.3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(205) set user vecXd vel_xy_yaw_min_trot_8_3 user to: [-1.4, -0.6, -2.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(206) set user vecXd vel_xy_yaw_min_trot_fast user to: [-1.2, -0.55, -2.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(207) set user vecXd vel_xy_yaw_min_trot_medium user to: [-1.2, -0.4, -2.25, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(208) set user vecXd vel_xy_yaw_min_trot_slow user to: [-0.6, -0.2, -1.3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(209) set user vecXd vel_xy_yaw_min_vision user to: [-0.5, -0.3, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(210) set user vecXd vel_xy_yaw_min_walk user to: [-0.2, -0.1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(211) set user vecXd vel_xy_yaw_scale user to: [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(212) set user vecXd vel_xy_yaw_zero_bound user to: [-0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(213) set user vecXd vel_xy_yaw_zero_pronk user to: [-0.01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(214) set user vecXd walk_offset_x user to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(215) set user vecXd walk_offset_y user to: [0.05, -0.05, 0.05, -0.05, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(216) set user vecXd walk_wave_height user to: [0.02, -0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(217) set user vecXd walk_wave_landing_offset user to: [0, -0.05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(218) set user vecXd walk_wave_pitch user to: [0.15, -0.15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(219) set user vecXd wbc_body_kd user to: [6, 6, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(220) set user vecXd wbc_body_kp user to: [60, 60, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(221) set user vecXd wbc_foot_kd user to: [60, 60, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(222) set user vecXd wbc_foot_kp user to: [500, 500, 500, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(223) set user double wbc_friction_bound user to: 0.05
+Response(224) set user double wbc_friction_default user to: 0.4
+Response(225) set user double wbc_friction_follow user to: 0.5
+Response(226) set user double wbc_friction_front_lift user to: 0.25
+Response(227) set user vecXd wbc_joint_kd user to: [1, 0.2, 0.2, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(228) set user vecXd wbc_joint_kp user to: [4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(229) set user vecXd wbc_orient_kd user to: [6, 6, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(230) set user vecXd wbc_orient_kp user to: [60, 60, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(231) set user double wbc_use_mpc_traj user to: 1
+Response(232) set user double wbc_use_mpc_traj_motion user to: 0
+Response(233) set user vecXd wbc_weight user to: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0, 0, 0, 0, 0, 0]
+Response(234) set user vecXd wbc_weight_ballet user to: [50, 50, 5, 10, 10, 10, 0, 0, 0, 0, 0, 0]
+Response(235) set user vecXd wbc_weight_default user to: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0, 0, 0, 0, 0, 0]
+Response(236) set user vecXd wbc_weight_diagonal user to: [50, 50, 500, 100, 100, 10, 0, 0, 0, 0, 0, 0]
+Response(237) set user vecXd wbc_weight_front_lift user to: [5, 5, 200, 10, 10, 10, 0, 0, 0, 0, 0, 0]
+Response(238) set user vecXd wbc_weight_jump user to: [1000, 1000, 1000, 1000, 1000, 1000, 0, 0, 0, 0, 0, 0]
+Response(239) set user vecXd wbc_weight_moonwalk user to: [5, 5, 10, 10, 10, 10, 0, 0, 0, 0, 0, 0]
+Response(240) set user vecXd wbc_weight_motion_default user to: [5, 5, 10, 10, 10, 10, 0, 0, 0, 0, 0, 0]
+Response(241) set user vecXd wbc_weight_pace_stride user to: [5, 5, 10, 10, 10, 200, 0, 0, 0, 0, 0, 0]
+Response(242) set user vecXd wbc_weight_passive_trot user to: [0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0, 0, 0, 0, 0, 0]
+Response(243) set user vecXd wbc_weight_pitch_step user to: [5, 5, 500, 10, 10, 10, 0, 0, 0, 0, 0, 0]
+Response(244) set user vecXd wbc_weight_rear_lift user to: [5, 5, 200, 10, 10, 10, 0, 0, 0, 0, 0, 0]
+Response(245) set user vecXd wbc_weight_user_gait user to: [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
+Response(246) set user vecXd wbc_weight_walk user to: [200, 200, 200, 200, 200, 200, 0, 0, 0, 0, 0, 0]
+Response(247) set user vecXd wbc_weight_walk_wave user to: [20, 20, 20, 2, 2, 2, 0, 0, 0, 0, 0, 0]
+Response(248) set user double x_effect_scale_neg user to: -0.65
+Response(249) set user double x_effect_scale_pos user to: -0.55
+Response(250) set user vecXd x_offset_bound user to: [0.05, 0.05, 0.02, 0.02, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(251) set user vecXd x_offset_default user to: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(252) set user double x_offset_pronk user to: -0
+Response(253) set user double x_offset_pronk_rl user to: -0.15
+Response(254) set user double x_offset_rapid_rl user to: -0.15
+Response(255) set user vecXd x_offset_trot_10_4 user to: [-0.02, -0.02, -0.02, -0.02, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(256) set user double y_effect_scale user to: -0.4
+Response(257) set user double y_offset_pronk_rl user to: 0.05
+Response(258) set user double y_offset_rapid_rl user to: 0
+Response(259) set user vecXd y_offset_trot user to: [0.04, -0.04, 0.04, -0.04, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(260) set user vecXd y_offset_trot_10_4 user to: [0.025, -0.035, 0.025, -0.035, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(261) set user vecXd yaw_effect_scale user to: [-0.05, -0.1, -0.6, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Response(262) set user double yaw_offset_pronk_rl user to: 0.25
+Response(263) set user double yaw_offset_rapid_rl user to: 0.15
+[Simulator Driver] First run of robot controller...
+	All 31 control parameters are initialized
+	All 232 user parameters are initialized
+[RobotRunner] initialize
+[FsmState] Initialized FSM state: passive
+[FsmState] Initialized FSM state: pose_ctrl
+[FsmState] Initialized FSM state: qp_stand
+[FsmState] Initialized FSM state: locomotion
+[Convex MPC] dt: 0.002 iterations: 15, dtMPC: 0.030
+[Solver] reallocated floating point numbers: 100650
+[Solver] malloced floating point numbers: 78080
+[Solver] Use Linear MPC !
+[Gait] user gait total mpc steps is 134
+[Gait] user gait total mpc steps is 320
+[Gait] user gait total mpc steps is 105
+[Gait] user gait total mpc steps is 105
+[Gait] user gait total mpc steps is 401
+[Gait] user gait total mpc steps is 288
+[Gait] user gait total mpc steps is 105
+[Gait] user gait total mpc steps is 105
+[Gait] user gait total mpc steps is 86
+[Gait] user gait total mpc steps is 137
+[Gait] user gait total mpc steps is 137
+[Gait] user gait total mpc steps is 152
+[Gait] user gait total mpc steps is 246
+[Gait] user gait total mpc steps is 134
+[Gait] user gait total mpc steps is 134
+[Gait] user gait total mpc steps is 134
+[Gait] user gait total mpc steps is 134
+[Gait] user gait total mpc steps is 152
+[Gait] user gait total mpc steps is 152
+[Gait] user gait total mpc steps is 152
+[Gait] user gait total mpc steps is 152
+[Gait] user gait total mpc steps is 30
+[Convex MPC] dt: 0.002 iterations: 15, dtMPC: 0.030
+[Solver] reallocated floating point numbers: 100650
+[Solver] malloced floating point numbers: 78080
+[Solver] Use Linear MPC !
+[FSM LOCOMOTION] solve-mpc  2   99
+[FsmState] Initialized FSM state: recovery_stand
+[FsmState] Initialized FSM state: pure_damper
+[FsmState] Initialized FSM state: two_leg_stand
+[FsmState] Initialized FSM state: jump_3d
+[DataReader] Loading offline trajectory /home/cyberdog_sim/src/cyberdog_locomotion/control/offline_trajectory/jump3d/SRBM_four_leg_jump_yaw_+90deg.dat...
+[DataReader] Allocating 201880 bytes for offline trajectory
+[DataReader] Successed loading offline trajectory for 490 time steps
+[DataReader] Setup jump for cyberdog
+[DataReader] Constructed.
+[DataReader] Loading offline trajectory /home/cyberdog_sim/src/cyberdog_locomotion/control/offline_trajectory/jump3d/Five-link_four_leg_jump_x_+60cm.dat...
+[DataReader] Allocating 255440 bytes for offline trajectory
+[DataReader] Successed loading offline trajectory for 620 time steps
+[DataReader] Setup jump for cyberdog
+[DataReader] Constructed.
+[DataReader] Loading offline trajectory /home/cyberdog_sim/src/cyberdog_locomotion/control/offline_trajectory/jump3d/SRBM_four_leg_jump_yaw_-90deg.dat...
+[DataReader] Allocating 201880 bytes for offline trajectory
+[DataReader] Successed loading offline trajectory for 490 time steps
+[DataReader] Setup jump for cyberdog
+[DataReader] Constructed.
+[DataReader] Loading offline trajectory /home/cyberdog_sim/src/cyberdog_locomotion/control/offline_trajectory/jump3d/SRBM_four_leg_jump_z_+30cm.dat...
+[DataReader] Allocating 189520 bytes for offline trajectory
+[DataReader] Successed loading offline trajectory for 460 time steps
+[DataReader] Setup jump for cyberdog
+[DataReader] Constructed.
+[DataReader] Loading offline trajectory /home/cyberdog_sim/src/cyberdog_locomotion/control/offline_trajectory/jump3d/SRBM_jump_down_stair_x_+50cm.dat...
+[DataReader] Allocating 255440 bytes for offline trajectory
+[DataReader] Successed loading offline trajectory for 620 time steps
+[DataReader] Setup jump for cyberdog
+[DataReader] Constructed.
+[DataReader] Loading offline trajectory /home/cyberdog_sim/src/cyberdog_locomotion/control/offline_trajectory/jump3d/SRBM_four_leg_jump_y_+20cm.dat...
+[DataReader] Allocating 234840 bytes for offline trajectory
+[DataReader] Successed loading offline trajectory for 570 time steps
+[DataReader] Setup jump for cyberdog
+[DataReader] Constructed.
+[DataReader] Loading offline trajectory /home/cyberdog_sim/src/cyberdog_locomotion/control/offline_trajectory/jump3d/Five-link_four_leg_jump_x_+30cm.dat...
+[DataReader] Allocating 255440 bytes for offline trajectory
+[DataReader] Successed loading offline trajectory for 620 time steps
+[DataReader] Setup jump for cyberdog
+[DataReader] Constructed.
+[DataReader] Loading offline trajectory /home/cyberdog_sim/src/cyberdog_locomotion/control/offline_trajectory/jump3d/SRBM_four_leg_jump_y_-20cm.dat...
+[DataReader] Allocating 234840 bytes for offline trajectory
+[DataReader] Successed loading offline trajectory for 570 time steps
+[DataReader] Setup jump for cyberdog
+[DataReader] Constructed.
+dt: 0.002000, step:2
+dt: 0.002000, step:2
+dt: 0.002000, step:2
+dt: 0.002000, step:2
+dt: 0.002000, step:2
+dt: 0.002000, step:2
+dt: 0.002000, step:2
+dt: 0.002000, step:2
+[FsmState] Initialized FSM state: motor_ctrl
+[FsmState] Initialized FSM state: force_jump
+[FsmState] Initialized FSM state: lifted
+[FsmState] Initialized FSM state: rl_reset
+[check pthread] [rl_reset] rl_model_inference  2   99
+[FsmState] Initialized FSM state: rl_rapid
+[check pthread] [RLRapid] rl_model_inference  2   99
+[CommandInterface] Robot unresponse! Cmd queue set to mode=0
+[CommandInterface::PrepareCmd] all command input TIMEOUT!
+ESTOP Tue May  5 09:32:25 2026
+ESTOP Tue May  5 09:32:28 2026
+ESTOP Tue May  5 09:32:31 2026
+ESTOP Tue May  5 09:32:33 2026
+Response(264) set robot s64 use_rc robot to: 0
+[CommandInterface::PrepareCmd] switch from to kGamepadCmd
+Response(265) set robot s64 control_mode robot to: 12
+[CommandInterface]Run: mode=12 gait_id=0 dura=0 motion_step=0 at Tue May  5 09:32:34 2026
+[CONTROL FSM] transition fsm from passive to recovery_stand
+[Gait] user gait total mpc steps is 134
+[Gait] user gait total mpc steps is 320
+[Gait] user gait total mpc steps is 105
+[Gait] user gait total mpc steps is 105
+[Gait] user gait total mpc steps is 401
+[Gait] user gait total mpc steps is 288
+[Gait] user gait total mpc steps is 105
+[Gait] user gait total mpc steps is 105
+[Gait] user gait total mpc steps is 86
+[Gait] user gait total mpc steps is 137
+[Gait] user gait total mpc steps is 137
+[Gait] user gait total mpc steps is 152
+[Gait] user gait total mpc steps is 246
+[Gait] user gait total mpc steps is 134
+[Gait] user gait total mpc steps is 134
+[Gait] user gait total mpc steps is 134
+[Gait] user gait total mpc steps is 134
+[Gait] user gait total mpc steps is 152
+[Gait] user gait total mpc steps is 152
+[Gait] user gait total mpc steps is 152
+[Gait] user gait total mpc steps is 152
+[Gait] user gait total mpc steps is 30
+[ConvexMpcMotionGaits] Initialized all user gaits in 1.43839 ms.
+[RecoveryStand] legs can foldlegs: 1 1 1 1
+[RecoveryStand] body height is 0.072007; Folding legs 
+[RecoveryStand] Fold Legs
+[RecoveryStand] Stand finish! first_stand_=1 liedown_ok_=0 gait_id=0 LieDown_flag_=0
+Response(266) set robot s64 control_mode robot to: 11
+[CommandInterface]Run: mode=11 gait_id=9 dura=0 motion_step=0 at Tue May  5 09:32:39 2026
+[CONTROL FSM] transition fsm from recovery_stand to locomotion
+[FSM LOCOMOTION] On Enter
+[CONTROL FSM] Operating Mode: NORMAL in locomotion
+
+[CONTROL FSM] Operating Mode: NORMAL in locomotion
+
+[CONTROL FSM] Operating Mode: NORMAL in locomotion
+
+[CONTROL FSM] Operating Mode: NORMAL in locomotion
+
+[CONTROL FSM] Operating Mode: NORMAL in locomotion
+

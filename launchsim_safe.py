@@ -17,8 +17,14 @@
 import os
 import sys
 import time
+import signal
+import threading
 import subprocess
 import argparse
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LOG_DIR = os.path.join(BASE_DIR, "logs")
+
 
 def kill_simulation_processes():
     """杀死所有与仿真相关的进程，防止端口或资源冲突。"""
@@ -28,162 +34,163 @@ def kill_simulation_processes():
         "rviz2",
         "cyberdog_control",
         "robot_controller",
-        "lcm-*",
+        "lcm-.*",
     ]
 
     print("[launchsim_safe] 正在清理旧的仿真进程...")
     for proc in processes_to_kill:
-        os.system(f"pkill -9 -f {proc} >/dev/null 2>&1")
-
-    # 额外清理 ROS2 相关守护进程
-    os.system("pkill -9 -f 'ros2 launch' >/dev/null 2>&1")
-    os.system("pkill -9 -f 'ros2 run' >/dev/null 2>&1")
+        subprocess.run(["pkill", "-9", "-f", proc], capture_output=True)
+    subprocess.run(["pkill", "-9", "-f", "ros2 launch"], capture_output=True)
+    subprocess.run(["pkill", "-9", "-f", "ros2 run"], capture_output=True)
     time.sleep(1)
     print("[launchsim_safe] 进程清理完成。")
 
-def run_in_background(script_path, log_path, env=None):
-    """在无图形界面环境下后台运行脚本，输出重定向到日志文件。"""
+
+def run_in_background(script_path, log_path, env=None, extra_args=None):
+    """在后台运行脚本，输出重定向到日志文件。"""
     env_vars = env.copy() if env else os.environ.copy()
+
     log_dir = os.path.dirname(log_path)
-    if log_dir and not os.path.exists(log_dir):
+    if log_dir:
         os.makedirs(log_dir, exist_ok=True)
+
+    cmd = ["bash", script_path]
+    if extra_args:
+        cmd.extend(extra_args)
+
     proc = subprocess.Popen(
-        ["bash", script_path],
+        cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         env=env_vars,
-        cwd="/home/cyberdog_sim"
+        cwd=BASE_DIR,
     )
-    # 启动一个线程将输出写入日志文件
+
     def write_log():
         try:
             with open(log_path, "wb") as f:
                 for line in proc.stdout:
                     f.write(line)
                     f.flush()
-        except Exception:
-            pass
-    import threading
+        except Exception as e:
+            print(f"[launchsim_safe] 日志写入失败 ({log_path}): {e}", file=sys.stderr)
+
     t = threading.Thread(target=write_log, daemon=True)
     t.start()
     return proc
 
+
 def launchsim():
-    # 解析命令行参数
-    parser = argparse.ArgumentParser(description='Cyberdog 仿真启动脚本')
-    parser.add_argument('--lidar', action='store_true', help='启用激光雷达')
-    parser.add_argument('--camera', action='store_true', help='启用RGB摄像头')
-    parser.add_argument('--world', type=str, default='race', help='选择地图: race(默认) / empty(空地+黄线)')
+    parser = argparse.ArgumentParser(description="Cyberdog 仿真启动脚本")
+    parser.add_argument("--lidar", action="store_true", help="启用激光雷达")
+    parser.add_argument("--camera", action="store_true", help="启用RGB摄像头")
+    parser.add_argument("--world", type=str, default="race",
+                        help="选择地图: race(默认) / empty(空地+黄线)")
     args = parser.parse_args()
 
     kill_simulation_processes()
 
-    log_dir = "/home/cyberdog_sim/logs"
-    os.makedirs(log_dir, exist_ok=True)
+    os.makedirs(LOG_DIR, exist_ok=True)
 
-    # 构建启动参数
-    gazebo_args = []
-    gazebo_args.extend(["--world", args.world])
+    my_env = os.environ.copy()
+
+    gazebo_args = ["--world", args.world]
     if args.lidar:
         gazebo_args.append("--lidar")
     if args.camera:
         gazebo_args.append("--camera")
 
-    print(f"[launchsim_safe] 地图: {args.world}, 激光雷达={'开启' if args.lidar else '关闭'}, RGB摄像头={'开启' if args.camera else '关闭'}")
-    print("[launchsim_safe] 启动 Gazebo 仿真...")
-    
-    # 使用环境变量传递参数
-    my_env = os.environ.copy()
-    
-    # 启动 Gazebo
-    gazebo_script = "./src/cyberdog_simulator/cyberdog_gazebo/script/launchgazebo.sh"
-    proc = subprocess.Popen(
-        ["bash", gazebo_script] + gazebo_args,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        env=my_env,
-        cwd="/home/cyberdog_sim"
+    state_msg = (
+        f"地图: {args.world}, "
+        f"激光雷达={'开启' if args.lidar else '关闭'}, "
+        f"RGB摄像头={'开启' if args.camera else '关闭'}"
     )
-    
-    # 启动日志线程
-    def write_log():
-        try:
-            with open(f"{log_dir}/gazebo.log", "wb") as f:
-                for line in proc.stdout:
-                    f.write(line)
-                    f.flush()
-        except Exception:
-            pass
-    
-    import threading
-    t = threading.Thread(target=write_log, daemon=True)
-    t.start()
-    
-    gazebo_proc = proc
+    print(f"[launchsim_safe] {state_msg}")
+
+    print("[launchsim_safe] 启动 Gazebo 仿真...")
+    gazebo_script = "./src/cyberdog_simulator/cyberdog_gazebo/script/launchgazebo.sh"
+    gazebo_proc = run_in_background(
+        gazebo_script,
+        os.path.join(LOG_DIR, "gazebo.log"),
+        env=my_env,
+        extra_args=gazebo_args,
+    )
     time.sleep(8)
 
     print("[launchsim_safe] 启动可视化界面...")
     visual_proc = run_in_background(
         "./src/cyberdog_simulator/cyberdog_gazebo/script/launchvisual.sh",
-        f"{log_dir}/visual.log"
+        os.path.join(LOG_DIR, "visual.log"),
+        env=my_env,
     )
     time.sleep(2)
 
     print("[launchsim_safe] 启动控制程序...")
     control_proc = run_in_background(
         "./src/cyberdog_simulator/cyberdog_gazebo/script/launchcontrol.sh",
-        f"{log_dir}/control.log"
+        os.path.join(LOG_DIR, "control.log"),
+        env=my_env,
     )
 
-    # 如果启用了摄像头，自动启动 Web 服务器
     web_proc = None
     if args.camera:
-        time.sleep(3)  # 等待摄像头初始化
+        time.sleep(3)
         print("[launchsim_safe] 启动摄像头 Web 服务器...")
         print("[launchsim_safe] 摄像头画面地址: http://localhost:8082")
-        
+
+        web_cmd = (
+            "source /opt/ros/galactic/setup.bash && "
+            f"source {BASE_DIR}/install/setup.bash && "
+            f"python3 {BASE_DIR}/camera_viewer/web_server.py"
+        )
         web_proc = subprocess.Popen(
-            ["bash", "-c", "source /opt/ros/galactic/setup.bash && source /home/cyberdog_sim/install/setup.bash && python3 /home/cyberdog_sim/camera_viewer/web_server.py"],
+            ["bash", "-c", web_cmd],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            cwd="/home/cyberdog_sim"
+            env=my_env,
+            cwd=BASE_DIR,
         )
-        
-        # Web 服务器日志线程
+
         def write_web_log():
             try:
-                with open(f"{log_dir}/camera_web.log", "wb") as f:
+                with open(os.path.join(LOG_DIR, "camera_web.log"), "wb") as f:
                     for line in web_proc.stdout:
                         f.write(line)
                         f.flush()
-            except Exception:
-                pass
-        
-        web_log_thread = threading.Thread(target=write_web_log, daemon=True)
-        web_log_thread.start()
+            except Exception as e:
+                print(
+                    f"[launchsim_safe] Web 日志写入失败: {e}", file=sys.stderr)
+
+        threading.Thread(target=write_web_log, daemon=True).start()
 
     print("[launchsim_safe] 所有进程已启动。")
-    print(f"[launchsim_safe] 日志目录: {log_dir}/")
+    print(f"[launchsim_safe] 日志目录: {LOG_DIR}/")
     if args.camera:
-        print("[launchsim_safe] 📷 摄像头 Web 界面: http://localhost:8082")
+        print("[launchsim_safe] 摄像头 Web 界面: http://localhost:8082")
     print("[launchsim_safe] 按 Ctrl+C 停止所有进程。")
 
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        print("\n[launchsim_safe] 收到中断信号，正在停止所有进程...")
-        procs = [gazebo_proc, visual_proc, control_proc]
-        if web_proc:
-            procs.append(web_proc)
+    def cleanup():
+        procs = [p for p in [gazebo_proc, visual_proc, control_proc, web_proc] if p]
         for proc in procs:
             proc.terminate()
             try:
                 proc.wait(timeout=3)
             except subprocess.TimeoutExpired:
                 proc.kill()
+                proc.wait()  # 回收僵尸进程
         kill_simulation_processes()
+
+    signal.signal(signal.SIGINT, lambda sig, frame: None)
+    signal.signal(signal.SIGTERM, lambda sig, frame: None)
+
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\n[launchsim_safe] 收到中断信号，正在停止所有进程...")
+        cleanup()
         print("[launchsim_safe] 已停止。")
+
 
 if __name__ == "__main__":
     launchsim()

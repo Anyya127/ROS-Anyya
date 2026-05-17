@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>full_track_nav</name>
+  <version>0.1.0</version>
+  <description>Full track navigation using robot_control_cmd_lcmt + Pure Pursuit</description>
+  <maintainer email="user@example.com">user</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>cyberdog_msg</depend>
+  <depend>lcm</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

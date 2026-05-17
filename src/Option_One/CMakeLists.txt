@@ -16,4 +16,9 @@ target_include_directories(test_turn PRIVATE ${LCM_TYPE_DIR})
 target_link_libraries(test_turn lcm)
 ament_target_dependencies(test_turn rclcpp cyberdog_msg)
 
+add_executable(follow_path_v2 src/follow_path_v2.cpp)
+target_include_directories(follow_path_v2 PRIVATE ${LCM_TYPE_DIR})
+target_link_libraries(follow_path_v2 lcm)
+ament_target_dependencies(follow_path_v2 rclcpp cyberdog_msg)
+
 ament_package()

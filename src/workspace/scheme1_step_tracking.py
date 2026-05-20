@@ -52,9 +52,12 @@ def load_path(csv_path):
     return path
 
 def nearest_index(path, x, y, start):
+    """只往前搜 200 点 (~4m), 防止交叉路口回跳"""
+    start = max(0, start)
     if start >= len(path): start = 0
     best, best_d = start, math.hypot(path[start][0]-x, path[start][1]-y)
-    for i in range(start+1, min(start+500, len(path))):
+    end = min(start + 200, len(path))
+    for i in range(start, end):
         d = math.hypot(path[i][0]-x, path[i][1]-y)
         if d < best_d: best_d = d; best = i
     return best

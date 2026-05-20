@@ -9,7 +9,7 @@ config_v3.py — 赛道配置文件
 # ═══════════════════════════════════════════════════════
 # 路线文件
 # ═══════════════════════════════════════════════════════
-PATH_CSV = "/home/cyberdog_sim/track_path_v11.csv"
+PATH_CSV = "/home/cyberdog_sim/src/workspace/track_path.csv"
 
 # ═══════════════════════════════════════════════════════
 # 跟踪参数
@@ -40,24 +40,27 @@ GOAL_TOL        = 0.35      # 终点判定半径 (m)
 # ═══════════════════════════════════════════════════════
 ZONES = [
     dict(name="S1_back",   gait="backward",
-         step_m=0.08, speed_ms=0.15,
-         x_min=-99, x_max=3.0,  y_min=-99, y_max=0.2),
+         step_m=0.08, speed_ms=0.18, times=1,
+         x_min=-99, x_max=2.5,  y_min=-99, y_max=0.6),
 
     dict(name="bridge_bump", gait="high_forward",
          step_m=0.06, speed_ms=0.12,
          x_min=3.0, x_max=99,   y_min=7.5, y_max=8.5),
 
-    dict(name="crouch_bar", gait="crouch",
-         step_m=0.04, speed_ms=0.08,
-         x_min=1.8, x_max=99,   y_min=9.3, y_max=10.8),
+    dict(name="crouch_bar1", gait="crouch",
+         step_m=0.04, speed_ms=0.13, times=2,
+         x_min=-2, x_max=0.6,   y_min=8.3, y_max=10.2),
+    
+     dict(name="crouch_bar2", gait="crouch",
+          step_m=0.04, speed_ms=0.13,
+          x_min=1.9, x_max=2.5,   y_min=9.3, y_max=11.8),
 
     dict(name="slope_area", gait="slope",
          step_m=0.04, speed_ms=0.08,
-         x_min=-99, x_max=99,   y_min=12.0, y_max=99),
+         x_min=-99, x_max=99,   y_min=11.5, y_max=99),
 
-    # ── 默认 (始终放最后) ──
     dict(name="default",   gait="forward",
-         step_m=STEP_FAR, speed_ms=0.20,
+         step_m=STEP_FAR, speed_ms=0.30,
          x_min=-99, x_max=99,   y_min=-99, y_max=99),
 ]
 
@@ -70,6 +73,18 @@ TRIGGERS = [
     dict(name="s1_done",
          x_min=2.5, x_max=99,  y_min=-99, y_max=0.5,
          action="announce", arg="石板路通过"),
+    
+     dict(name="crouch_bar1", 
+         x_min=-2, x_max=0.6,   y_min=8.3, y_max=10.2,
+         action="announce", arg="识别到限高杆"),
+     
+     dict(name="obstacle", skip=2,
+         x_min=0.5, x_max=2.0,   y_min=8.3, y_max=10.2,
+         action="announce", arg="识别到障碍物"),
+    
+     dict(name="crouch_bar2",
+          x_min=1.9, x_max=2.5,y_min=9.3, y_max=10.8,
+          action="announce", arg="识别到限高杆"),
 
     dict(name="bridge_enter",
          x_min=3.0, x_max=99,  y_min=7.0, y_max=7.5,
@@ -83,5 +98,5 @@ TRIGGERS = [
 # ═══════════════════════════════════════════════════════
 # 斜坡力控
 # ═══════════════════════════════════════════════════════
-SLOPE_FORCE_GAIN = 100.0
+SLOPE_FORCE_GAIN = 300.0
 SLOPE_LEAN_GAIN  = 0.8

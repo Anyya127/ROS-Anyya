@@ -14,9 +14,11 @@ import sys, os, time, math, threading, subprocess
 
 sys.path.insert(0, '/usr/local/lib/python3.8/site-packages')
 sys.path.insert(0, '/home/cyberdog_sim/src/cyberdog_locomotion/common/lcm_type/lcm')
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lcm
 from robot_control_cmd_lcmt import robot_control_cmd_lcmt
 from simulator_lcmt import simulator_lcmt
+from file_send_lcmt import file_send_lcmt
 
 # ── 与原 gait_lib 相同的常量 ─────────────────────────
 MPS_PER_SEC  = 1.0
@@ -87,10 +89,11 @@ class GaitLib:
     # init / finish / 持续运动 / 离散步态 — 同 gait_lib
     # ═══════════════════════════════════════════════════
     def init(self, timeout=15.0):
-        print("[GaitLibV2] Flushing...")
+        print("[GaitLibV2] Flushing & loading gait...")
         for _ in range(10):
             self._send(vf=0, vl=0, vy=0, step_h=0.0, pos_z=0.0)
             self._pump(); time.sleep(0.05)
+        self._load_user_gait()  # 趴着时加载, 无超时风险
         print("[GaitLibV2] Waiting pose...")
         waited = 0.0
         while not self._valid and waited < timeout:
@@ -127,8 +130,25 @@ class GaitLib:
     def shift_left(self, speed=0.05):   self._send(vl=speed)
     def shift_right(self, speed=0.05):  self._send(vl=-speed)
     def stop(self):                     self._send()
+
+    def _load_user_gait(self):
+        """加载自定义步态参数 (mode=62 gait=110 低姿态高抬腿) — 无阻塞"""
+        workdir = os.path.dirname(os.path.abspath(__file__))
+        def_file = os.path.join(workdir, "usergait_def.toml")
+        param_file = os.path.join(workdir, "usergait_param_full.toml")
+        if not os.path.exists(def_file) or not os.path.exists(param_file):
+            print("[GaitLibV2] WARNING: user_gait files not found")
+            return
+        msg = file_send_lcmt()
+        for fpath in [def_file, param_file]:
+            with open(fpath, 'r') as f:
+                msg.data = f.read()
+            self.lc_tx.publish("user_gait_file", msg.encode())
+        print("[GaitLibV2] User gait loaded (mode=62)")
+
     def low_walk(self, speed=0.15):
-        self._send(mode=MODE_MOTION, gait_id=GAIT_USER, vf=speed, step_h=0.08)
+        """低姿态高抬腿行走 (过限高杆, mode=62)"""
+        self._send(mode=MODE_MOTION, gait_id=GAIT_USER, vf=speed, step_h=0.08, pos_z=0.12)
 
     def _step_run(self, vf=0.0, vl=0.0, vy=0.0, step_h=0.03, dur_ms=1000, pos_z=0.20):
         ticks = max(1, dur_ms * 1000 // _TICK_US)
@@ -153,8 +173,15 @@ class GaitLib:
         if distance <= 0 or speed <= 0: return
         self._step_run(vf=speed, step_h=0.08, dur_ms=max(100, int(distance/(speed*MPS_PER_SEC)*1000*STEP_MARGIN)))
     def crouch_step_forward(self, distance=0.06, speed=0.10):
+        """匍匐前进 (mode=62 gait=110 低姿态高抬腿, 50Hz)"""
         if distance <= 0 or speed <= 0: return
-        self._step_run(vf=speed, step_h=0.08, pos_z=0.08, dur_ms=max(100, int(distance/(speed*MPS_PER_SEC)*1000*STEP_MARGIN)))
+        dur_ms = max(300, int(distance/(speed*MPS_PER_SEC)*1000*STEP_MARGIN))
+        ticks = max(1, dur_ms * 1000 // _TICK_US)
+        for _ in range(ticks):
+            self._send(mode=MODE_MOTION, gait_id=GAIT_USER, vf=speed,
+                       step_h=0.08, pos_z=0.12)
+            self._pump(); time.sleep(_TICK_US / 1_000_000)
+        self._send(vf=0, vl=0, vy=0); self._pump()
     def step_shift(self, distance=0.03, speed=0.05):
         if abs(distance) < 0.005: return
         vl = speed if distance > 0 else -speed

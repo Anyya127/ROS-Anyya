@@ -17,6 +17,8 @@ import config_v3 as cfg
 
 running = True
 _triggers_fired = set()
+_trigger_enters = {}     # trigger_name → 进入次数 (配合 skip=N 使用)
+_zone_enters = {}        # zone_name → 进入次数 (配合 times=N 使用)
 
 def on_sigint(*_):
     global running; running = False
@@ -40,9 +42,12 @@ def load_path(csv_path):
     return path
 
 def nearest_index(path, x, y, start):
+    """只往前搜 200 点 (~4m), 防止交叉路口回跳"""
+    start = max(0, start)
     if start >= len(path): start = 0
     best, best_d = start, math.hypot(path[start][0]-x, path[start][1]-y)
-    for i in range(start+1, min(start+500, len(path))):
+    end = min(start + 200, len(path))
+    for i in range(start, end):
         d = math.hypot(path[i][0]-x, path[i][1]-y)
         if d < best_d: best_d = d; best = i
     return best
@@ -62,19 +67,35 @@ def is_curve(path, idx, n=10):
 
 def match_zone(x, y):
     for z in cfg.ZONES:
+        t = z.get('times', 0)  # 0=无限, N=最多触发N次
+        if t > 0 and _zone_enters.get(z['name'], 0) >= t:
+            continue
         if z['x_min'] <= x <= z['x_max'] and z['y_min'] <= y <= z['y_max']:
             return z
     return cfg.ZONES[-1]
 
 def match_triggers(x, y):
-    return [t for t in cfg.TRIGGERS
-            if t['name'] not in _triggers_fired
-            and t['x_min'] <= x <= t['x_max']
-            and t['y_min'] <= y <= t['y_max']]
+    matched = []
+    for t in cfg.TRIGGERS:
+        if t['name'] in _triggers_fired:
+            continue
+        if not (t['x_min'] <= x <= t['x_max'] and t['y_min'] <= y <= t['y_max']):
+            continue
+        # skip=N: 跳过前N次, 第N+1次触发
+        skip = t.get('skip', 0)
+        if skip > 0:
+            cnt = _trigger_enters.get(t['name'], 0) + 1
+            _trigger_enters[t['name']] = cnt
+            if cnt <= skip:
+                continue  # 还没到触发次数
+        matched.append(t)
+    return matched
 
 def fire_trigger(gl, t):
     _triggers_fired.add(t['name'])
-    print(f"\n  ⚡ [{t['name']}]", end='')
+    skip = t.get('skip', 0)
+    tag = f" (after {skip} skips)" if skip else ""
+    print(f"\n  ⚡ [{t['name']}]{tag}", end='')
     if t['action'] == 'announce':
         print(f" 📢 {t['arg']}"); gl.announce(t['arg'])
     elif t['action'] == 'print':
@@ -123,7 +144,18 @@ def run():
         # ── 区域 ──
         zone = match_zone(x, y)
         if zone != last_zone:
-            print(f"\n  ➜ [{zone['name']}] gait={zone['gait']}")
+            # 离开 times=N 区域时计数 (进入+退出=完成1次)
+            if last_zone:
+                t = last_zone.get('times', 0)
+                if t > 0:
+                    cnt = _zone_enters.get(last_zone['name'], 0) + 1
+                    _zone_enters[last_zone['name']] = cnt
+                    print(f"  ✓ [{last_zone['name']}] done ({cnt}/{t})")
+            # 进入新区域
+            t = zone.get('times', 0)
+            remain = t - _zone_enters.get(zone['name'], 0) if t > 0 else -1
+            tag = f" ({remain}/{t} left)" if t > 0 else ""
+            print(f"\n  ➜ [{zone['name']}] gait={zone['gait']}{tag}")
             last_zone = zone
 
         # ── 斜坡力控 (滞后) ──

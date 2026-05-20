@@ -1,0 +1,235 @@
+#!/usr/bin/env python3
+"""
+gait_lib_v2.py — 步态积木库 V2 (+斜坡力控 +身体倾斜)
+
+继承 gait_lib 全部功能，新增:
+  enable_slope_comp()   — 开启 IMU 反馈力控 + 身体倾斜
+  disable_slope_comp()  — 关闭
+  _slope_tick()         — 斜坡补偿心跳 (节流每5步)
+
+力控通过 ros2 topic pub 施加 (非阻塞 subprocess.Popen)。
+"""
+
+import sys, os, time, math, threading, subprocess
+
+sys.path.insert(0, '/usr/local/lib/python3.8/site-packages')
+sys.path.insert(0, '/home/cyberdog_sim/src/cyberdog_locomotion/common/lcm_type/lcm')
+import lcm
+from robot_control_cmd_lcmt import robot_control_cmd_lcmt
+from simulator_lcmt import simulator_lcmt
+
+# ── 与原 gait_lib 相同的常量 ─────────────────────────
+MPS_PER_SEC  = 1.0
+RAD_PER_SEC  = 1.0
+STEP_MARGIN  = 1.3
+GAIT_TROT_SLOW = 27; GAIT_TROT_MED = 3; GAIT_WALK = 6; GAIT_USER = 110
+CONTACT_ALL = 15
+MODE_LOCOMOTION = 11; MODE_STAND = 12; MODE_PRONE = 7; MODE_MOTION = 62
+_TICK_US = 20000
+
+# ── ROS2 source (只执行一次) ─────────────────────────
+_SOURCED = [False]
+
+def _source_env():
+    if _SOURCED[0]:
+        return ""
+    _SOURCED[0] = True
+    return ("source /opt/ros/galactic/setup.bash && "
+            "source /home/cyberdog_sim/install/setup.bash && ")
+
+class GaitLib:
+    """步态积木库 V2"""
+
+    def __init__(self):
+        self.lc_tx = lcm.LCM("udpm://239.255.76.67:7671?ttl=255")
+        self.lc_rx = lcm.LCM()
+        self._msg = robot_control_cmd_lcmt()
+        self._life = 0
+        self._lock = threading.Lock()
+        self.x = 0.0; self.y = 0.0; self.z = 0.0
+        self.roll = 0.0; self.pitch = 0.0; self.yaw = 0.0
+        self._valid = False
+        self.lc_rx.subscribe("simulator_state", self._on_state)
+
+    def _on_state(self, channel, data):
+        m = simulator_lcmt().decode(data)
+        with self._lock:
+            self.x = m.p[0]; self.y = m.p[1]; self.z = m.p[2]
+            roll_deg = math.degrees(m.rpy[0])
+            is_upright = abs(abs(roll_deg) - 0) < abs(abs(roll_deg) - 180)
+            self.roll = m.rpy[0]; self.pitch = m.rpy[1]
+            self.yaw = m.rpy[2] if is_upright else m.rpy[2] + math.pi
+            self._valid = True
+
+    def _pump(self):
+        self.lc_rx.handle_timeout(10)
+
+    def _send(self, mode=MODE_LOCOMOTION, gait_id=GAIT_TROT_SLOW,
+              vf=0.0, vl=0.0, vy=0.0, step_h=0.03, pos_z=0.20,
+              contact=CONTACT_ALL, duration=0):
+        self._life = (self._life + 1) % 127
+        m = self._msg
+        m.mode = mode; m.gait_id = gait_id; m.contact = contact
+        m.life_count = self._life; m.duration = duration
+        m.vel_des[0] = vf; m.vel_des[1] = vl; m.vel_des[2] = vy
+        m.step_height[0] = step_h; m.step_height[1] = step_h
+        m.pos_des[2] = pos_z
+        m.rpy_des[0] = 0.0; m.rpy_des[1] = 0.0; m.rpy_des[2] = 0.0
+        m.value = 0
+        for i in range(3):
+            m.pos_des[i] = 0.0 if i != 2 else pos_z
+            m.acc_des[i] = 0.0; m.acc_des[i+3] = 0.0
+            m.ctrl_point[i] = 0.0
+        for i in range(6): m.foot_pose[i] = 0.0
+        self.lc_tx.publish("robot_control_cmd", m.encode())
+
+    # ═══════════════════════════════════════════════════
+    # init / finish / 持续运动 / 离散步态 — 同 gait_lib
+    # ═══════════════════════════════════════════════════
+    def init(self, timeout=15.0):
+        print("[GaitLibV2] Flushing...")
+        for _ in range(10):
+            self._send(vf=0, vl=0, vy=0, step_h=0.0, pos_z=0.0)
+            self._pump(); time.sleep(0.05)
+        print("[GaitLibV2] Waiting pose...")
+        waited = 0.0
+        while not self._valid and waited < timeout:
+            self._pump(); time.sleep(0.1); waited += 0.1
+        print("[GaitLibV2] Standing up...")
+        t0 = time.time()
+        while time.time() - t0 < 7.0:
+            self._send(mode=MODE_STAND, gait_id=0, contact=0, step_h=0.0, pos_z=0.0)
+            self._pump(); time.sleep(0.2)
+        print("[GaitLibV2] Settling after stand...")
+        for _ in range(10):
+            self._send(mode=MODE_STAND, gait_id=0, contact=0, step_h=0.0, pos_z=0.0)
+            self._pump(); time.sleep(0.2)
+        print("[GaitLibV2] Entering locomotion...")
+        t0 = time.time()
+        while time.time() - t0 < 3.0:
+            self._send(vf=0, vl=0, vy=0); self._pump(); time.sleep(0.2)
+        print("[GaitLibV2] Settling in loco...")
+        for _ in range(10):
+            self._send(vf=0, vl=0, vy=0); self._pump(); time.sleep(0.2)
+        self._pump()
+        x, y, _, _, _, yaw = self.get_position()
+        print(f"[GaitLibV2] Ready. pose=({x:.2f},{y:.2f}) yaw={math.degrees(yaw):.0f}°")
+
+    def finish(self):
+        self._send(vf=0, vl=0, vy=0); time.sleep(0.6)
+        self._send(mode=MODE_PRONE, gait_id=0, contact=0); time.sleep(3)
+        print("[GaitLibV2] Finished.")
+
+    def forward(self, speed=0.2):       self._send(vf=speed)
+    def backward(self, speed=0.1):      self._send(vf=-speed)
+    def turn_left(self, rate=0.5):      self._send(vy=rate)
+    def turn_right(self, rate=0.5):     self._send(vy=-rate)
+    def shift_left(self, speed=0.05):   self._send(vl=speed)
+    def shift_right(self, speed=0.05):  self._send(vl=-speed)
+    def stop(self):                     self._send()
+    def low_walk(self, speed=0.15):
+        self._send(mode=MODE_MOTION, gait_id=GAIT_USER, vf=speed, step_h=0.08)
+
+    def _step_run(self, vf=0.0, vl=0.0, vy=0.0, step_h=0.03, dur_ms=1000, pos_z=0.20):
+        ticks = max(1, dur_ms * 1000 // _TICK_US)
+        for _ in range(ticks):
+            self._send(vf=vf, vl=vl, vy=vy, step_h=step_h, pos_z=pos_z)
+            self._pump(); time.sleep(_TICK_US / 1_000_000)
+        self._send(vf=0, vl=0, vy=0); self._pump()
+
+    def step_forward(self, distance=0.08, speed=0.2):
+        if distance <= 0 or speed <= 0: return
+        self._step_run(vf=speed, dur_ms=max(100, int(distance/(speed*MPS_PER_SEC)*1000*STEP_MARGIN)))
+    def step_backward(self, distance=0.05, speed=0.1):
+        if distance <= 0 or speed <= 0: return
+        self._step_run(vf=-speed, dur_ms=max(100, int(distance/(speed*MPS_PER_SEC)*1000*STEP_MARGIN)))
+    def step_turn(self, degrees, rate=None):
+        if abs(degrees) < 1: return
+        if rate is None: rate = 0.5 if abs(degrees) > 30 else 0.25
+        rad = math.radians(abs(degrees))
+        vy = rate if degrees > 0 else -rate
+        self._step_run(vy=vy, step_h=0.05, dur_ms=max(150, int(rad/(rate*RAD_PER_SEC)*1000*STEP_MARGIN)))
+    def step_high_forward(self, distance=0.08, speed=0.15):
+        if distance <= 0 or speed <= 0: return
+        self._step_run(vf=speed, step_h=0.08, dur_ms=max(100, int(distance/(speed*MPS_PER_SEC)*1000*STEP_MARGIN)))
+    def crouch_step_forward(self, distance=0.06, speed=0.10):
+        if distance <= 0 or speed <= 0: return
+        self._step_run(vf=speed, step_h=0.08, pos_z=0.08, dur_ms=max(100, int(distance/(speed*MPS_PER_SEC)*1000*STEP_MARGIN)))
+    def step_shift(self, distance=0.03, speed=0.05):
+        if abs(distance) < 0.005: return
+        vl = speed if distance > 0 else -speed
+        self._step_run(vl=vl, dur_ms=max(100, int(abs(distance)/(speed*MPS_PER_SEC)*1000*STEP_MARGIN)))
+    def jump(self):
+        self._send(mode=22, gait_id=0, contact=0, step_h=0.0, pos_z=0.0)
+        time.sleep(0.5); self._pump()
+    def announce(self, text):
+        try:
+            subprocess.Popen(["espeak-ng", "-v", "zh", text],
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except FileNotFoundError: pass
+        print(f"  📢 {text}")
+
+    def get_position(self):
+        self._pump()
+        with self._lock:
+            return (self.x, self.y, self.z, self.roll, self.pitch, self.yaw)
+
+    @property
+    def pose_valid(self):
+        with self._lock: return self._valid
+
+    def stuck_recover(self):
+        print("  [RECOVER] back 0.5s...")
+        self._step_run(vf=-0.15, dur_ms=500)
+
+    # ═══════════════════════════════════════════════════
+    # 斜坡力控 V2 (非阻塞版)
+    # ═══════════════════════════════════════════════════
+    def _apply_force(self, fx=0.0, fy=0.0, fz=0.0, duration=0.5, link="base_link"):
+        cmd = (
+            f"{_source_env()}"
+            f"ros2 topic pub -1 /apply_force cyberdog_msg/msg/ApplyForce "
+            f"\"{{link_name: '{link}', force: [{fx:.1f},{fy:.1f},{fz:.1f}], "
+            f"rel_pos: [0.0,0.0,0.0], time: {duration:.1f}}}\""
+        )
+        subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    def _set_body_lean(self, roll_des=0.0, pitch_des=0.0, height_des=0.15):
+        cmd = (
+            f"{_source_env()}"
+            f"ros2 topic pub -1 /yaml_parameter cyberdog_msg/msg/YamlParam "
+            f"\"{{name: des_roll_pitch_height, kind: 3, "
+            f"vecxd_value: [{roll_des:.3f},{pitch_des:.3f},{height_des:.3f},"
+            f"0,0,0,0,0,0,0,0,0], is_user: 1}}\""
+        )
+        subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    def enable_slope_comp(self, force_gain=100.0, lean_gain=0.8):
+        self._slope_comp = True
+        self._slope_force_gain = force_gain
+        self._slope_lean_gain = lean_gain
+        self._filt_roll = self.roll; self._filt_pitch = self.pitch
+        self._filt_alpha = 0.4; self._slope_tick_cnt = 0
+        self._set_body_lean(0, 0, 0.08)
+        print(f"[GaitLibV2] Slope ON (force={force_gain} lean={lean_gain})")
+
+    def disable_slope_comp(self):
+        self._slope_comp = False
+        self._apply_force(0, 0, 0, 0.1)
+        self._set_body_lean(0, 0, 0.20)
+        print("[GaitLibV2] Slope OFF")
+
+    def _slope_tick(self):
+        if not getattr(self, '_slope_comp', False): return
+        self._slope_tick_cnt = getattr(self, '_slope_tick_cnt', 0) + 1
+        if self._slope_tick_cnt % 5 != 0: return  # 节流
+        a = self._filt_alpha
+        self._filt_roll  = a*self.roll  + (1-a)*self._filt_roll
+        self._filt_pitch = a*self.pitch + (1-a)*self._filt_pitch
+        Kf = self._slope_force_gain; Kl = self._slope_lean_gain
+        fx = -Kf * math.sin(self._filt_pitch)
+        fy = -Kf * math.sin(self._filt_roll)
+        lr =  Kl * math.sin(self._filt_roll)
+        lp =  Kl * math.sin(self._filt_pitch)
+        self._apply_force(fx, fy, 0, 0.5)
+        self._set_body_lean(lr, lp, 0.08)

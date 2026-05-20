@@ -29,13 +29,8 @@ CONTACT_ALL = 15
 MODE_LOCOMOTION = 11; MODE_STAND = 12; MODE_PRONE = 7; MODE_MOTION = 62
 _TICK_US = 20000
 
-# ── ROS2 source (只执行一次) ─────────────────────────
-_SOURCED = [False]
-
+# ── ROS2 source ─────────────────────────
 def _source_env():
-    if _SOURCED[0]:
-        return ""
-    _SOURCED[0] = True
     return ("source /opt/ros/galactic/setup.bash && "
             "source /home/cyberdog_sim/install/setup.bash && ")
 
@@ -182,6 +177,18 @@ class GaitLib:
                        step_h=0.08, pos_z=0.12)
             self._pump(); time.sleep(_TICK_US / 1_000_000)
         self._send(vf=0, vl=0, vy=0); self._pump()
+
+    def slope_step_forward(self, distance=0.04, speed=0.06):
+        """斜坡防滑: WALK步态(三点支撑) + 极低重心 + 高抬腿"""
+        if distance <= 0 or speed <= 0: return
+        dur_ms = max(500, int(distance/(speed*MPS_PER_SEC)*1000*STEP_MARGIN))
+        ticks = max(1, dur_ms * 1000 // _TICK_US)
+        for _ in range(ticks):
+            # WALK步态(gait=6)始终三点着地, 比TROT稳
+            self._send(mode=MODE_LOCOMOTION, gait_id=GAIT_WALK, vf=speed,
+                       step_h=0.10, pos_z=0.06, contact=CONTACT_ALL)
+            self._pump(); time.sleep(_TICK_US / 1_000_000)
+        self._send(vf=0, vl=0, vy=0); self._pump()
     def step_shift(self, distance=0.03, speed=0.05):
         if abs(distance) < 0.005: return
         vl = speed if distance > 0 else -speed
@@ -213,8 +220,14 @@ class GaitLib:
     # 斜坡力控 V2 (非阻塞版)
     # ═══════════════════════════════════════════════════
     def _apply_force(self, fx=0.0, fy=0.0, fz=0.0, duration=0.5, link="base_link"):
+        # 限幅: 单方向不超过 30N (防弹飞)
+        fx = max(-30, min(30, fx))
+        fy = max(-30, min(30, fy))
+        if abs(fx) < 0.5 and abs(fy) < 0.5:
+            return  # 力太小不发, 减少 ROS2 开销
+        src = _source_env()
         cmd = (
-            f"{_source_env()}"
+            f"{src}"
             f"ros2 topic pub -1 /apply_force cyberdog_msg/msg/ApplyForce "
             f"\"{{link_name: '{link}', force: [{fx:.1f},{fy:.1f},{fz:.1f}], "
             f"rel_pos: [0.0,0.0,0.0], time: {duration:.1f}}}\""
@@ -222,8 +235,9 @@ class GaitLib:
         subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     def _set_body_lean(self, roll_des=0.0, pitch_des=0.0, height_des=0.15):
+        src = _source_env()
         cmd = (
-            f"{_source_env()}"
+            f"{src}"
             f"ros2 topic pub -1 /yaml_parameter cyberdog_msg/msg/YamlParam "
             f"\"{{name: des_roll_pitch_height, kind: 3, "
             f"vecxd_value: [{roll_des:.3f},{pitch_des:.3f},{height_des:.3f},"

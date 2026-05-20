@@ -111,7 +111,7 @@ def execute_gait(gl, zone, dg):
     if   g == 'backward':      gl.step_backward(d, speed=s)
     elif g == 'high_forward':  gl.step_high_forward(d, speed=s)
     elif g == 'crouch':        gl.crouch_step_forward(d, speed=s)
-    elif g == 'slope':         gl.step_forward(d, speed=s)
+    elif g == 'slope':         gl.slope_step_forward(d, speed=s)
     else:                      gl.step_forward(d, speed=s)
 
 # ═══════════════════════════════════════════════════════
@@ -130,7 +130,7 @@ def run():
     last_x, last_y = x, y
     stuck_cnt = step = 0
     total_dist = 0.0
-    last_zone = slope_active = None
+    last_zone = None
 
     goal = path[-1]
     print(f"\n═══ V3 ═══")
@@ -158,16 +158,6 @@ def run():
             print(f"\n  ➜ [{zone['name']}] gait={zone['gait']}{tag}")
             last_zone = zone
 
-        # ── 斜坡力控 (滞后) ──
-        if zone['gait'] == 'slope' or slope_active:
-            want = (y > 12.2) if not slope_active else (y > 11.8)
-            if want and not slope_active:
-                gl.enable_slope_comp(cfg.SLOPE_FORCE_GAIN, cfg.SLOPE_LEAN_GAIN)
-                slope_active = True
-            elif not want and slope_active:
-                gl.disable_slope_comp(); slope_active = False
-        if slope_active: gl._slope_tick()
-
         # ── 触发器 ──
         for t in match_triggers(x, y): fire_trigger(gl, t)
 
@@ -194,8 +184,10 @@ def run():
 
         # ── 执行 ──
         if abs(a_err) > cfg.ANGLE_THRESH:
-            rate = 0.5 if abs(a_err) > cfg.TURN_FAST_THRES else 0.25
-            gl.step_turn(a_err, rate=rate)
+            # 单次旋转不超过 45°, 分多步完成防摔倒
+            turn_deg = max(-45, min(45, a_err))
+            rate = 0.35 if abs(a_err) > cfg.TURN_FAST_THRES else 0.25
+            gl.step_turn(turn_deg, rate=rate)
         else:
             execute_gait(gl, zone, dg)
 
@@ -216,7 +208,6 @@ def run():
             print(f"  [{step:5d}] ({x:6.2f},{y:6.2f}) y={math.degrees(yaw):5.0f}°  "
                   f"wp={idx:5d} a_err={a_err:+5.1f}° dg={dg:4.1f}m [{zone['name']}]")
 
-    if slope_active: gl.disable_slope_comp()
     gl.finish()
     print(f"\nDone. steps={step} dist={total_dist:.1f}m")
 

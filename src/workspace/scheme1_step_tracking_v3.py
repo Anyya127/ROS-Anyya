@@ -144,19 +144,30 @@ def run():
         # ── 区域 ──
         zone = match_zone(x, y)
         if zone != last_zone:
-            # 离开 times=N 区域时计数 (进入+退出=完成1次)
+            # 离开旧区域
             if last_zone:
                 t = last_zone.get('times', 0)
                 if t > 0:
                     cnt = _zone_enters.get(last_zone['name'], 0) + 1
                     _zone_enters[last_zone['name']] = cnt
                     print(f"  ✓ [{last_zone['name']}] done ({cnt}/{t})")
+                # 离开斜坡区 → 恢复默认步态 + 关力控
+                if last_zone['gait'] == 'slope':
+                    gl._restore_default_gait()
+                    gl.disable_slope_comp()
             # 进入新区域
             t = zone.get('times', 0)
             remain = t - _zone_enters.get(zone['name'], 0) if t > 0 else -1
             tag = f" ({remain}/{t} left)" if t > 0 else ""
             print(f"\n  ➜ [{zone['name']}] gait={zone['gait']}{tag}")
+            # 进入斜坡区 → 加载壁虎步态 + 开 IMU 力控
+            if zone['gait'] == 'slope':
+                gl._load_gecko_slope_gait()
+                gl.enable_slope_comp()
             last_zone = zone
+
+        # ── 斜坡力控心跳 (非斜坡区自动跳过) ──
+        gl._slope_tick()
 
         # ── 触发器 ──
         for t in match_triggers(x, y): fire_trigger(gl, t)
@@ -187,7 +198,10 @@ def run():
             # 单次旋转不超过 45°, 分多步完成防摔倒
             turn_deg = max(-45, min(45, a_err))
             rate = 0.35 if abs(a_err) > cfg.TURN_FAST_THRES else 0.25
-            gl.step_turn(turn_deg, rate=rate)
+            if zone['gait'] == 'slope':
+                gl.step_turn_low(turn_deg, rate=rate)
+            else:
+                gl.step_turn(turn_deg, rate=rate)
         else:
             execute_gait(gl, zone, dg)
 

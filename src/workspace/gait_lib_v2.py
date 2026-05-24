@@ -141,6 +141,25 @@ class GaitLib:
             self.lc_tx.publish("user_gait_file", msg.encode())
         print("[GaitLibV2] User gait loaded (mode=62)")
 
+    def _load_gecko_slope_gait(self):
+        """加载壁虎斜坡爬行步态 — Z字下扎足端 + 四点支撑wave gait"""
+        workdir = os.path.dirname(os.path.abspath(__file__))
+        def_file = os.path.join(workdir, "gecko_slope_def.toml")
+        param_file = os.path.join(workdir, "gecko_slope_param.toml")
+        if not os.path.exists(def_file) or not os.path.exists(param_file):
+            print("[GaitLibV2] WARNING: gecko_slope gait files not found")
+            return
+        msg = file_send_lcmt()
+        for fpath in [def_file, param_file]:
+            with open(fpath, 'r') as f:
+                msg.data = f.read()
+            self.lc_tx.publish("user_gait_file", msg.encode())
+        print("[GaitLibV2] Gecko slope gait loaded")
+
+    def _restore_default_gait(self):
+        """恢复默认 user gait 参数"""
+        self._load_user_gait()
+
     def low_walk(self, speed=0.15):
         """低姿态高抬腿行走 (过限高杆, mode=62)"""
         self._send(mode=MODE_MOTION, gait_id=GAIT_USER, vf=speed, step_h=0.08, pos_z=0.12)
@@ -164,6 +183,20 @@ class GaitLib:
         rad = math.radians(abs(degrees))
         vy = rate if degrees > 0 else -rate
         self._step_run(vy=vy, step_h=0.05, dur_ms=max(150, int(rad/(rate*RAD_PER_SEC)*1000*STEP_MARGIN)))
+    def step_turn_low(self, degrees, rate=None):
+        """低姿旋转 (限高杆/斜坡区域, mode=62 gait=110 保持低重心)"""
+        if abs(degrees) < 1: return
+        if rate is None: rate = 0.3 if abs(degrees) > 30 else 0.2
+        rad = math.radians(abs(degrees))
+        vy = rate if degrees > 0 else -rate
+        dur_ms = max(150, int(rad/(rate*RAD_PER_SEC)*1000*STEP_MARGIN))
+        ticks = max(1, dur_ms * 1000 // _TICK_US)
+        for _ in range(ticks):
+            self._send(mode=MODE_MOTION, gait_id=GAIT_USER, vy=vy,
+                       step_h=0.06, pos_z=0.10, contact=CONTACT_ALL)
+            self._pump(); time.sleep(_TICK_US / 1_000_000)
+        self._send(mode=MODE_MOTION, gait_id=GAIT_USER, vf=0, vl=0, vy=0,
+                   step_h=0.06, pos_z=0.10, contact=CONTACT_ALL); self._pump()
     def step_high_forward(self, distance=0.08, speed=0.15):
         if distance <= 0 or speed <= 0: return
         self._step_run(vf=speed, step_h=0.08, dur_ms=max(100, int(distance/(speed*MPS_PER_SEC)*1000*STEP_MARGIN)))
@@ -176,19 +209,20 @@ class GaitLib:
             self._send(mode=MODE_MOTION, gait_id=GAIT_USER, vf=speed,
                        step_h=0.08, pos_z=0.12)
             self._pump(); time.sleep(_TICK_US / 1_000_000)
-        self._send(vf=0, vl=0, vy=0); self._pump()
+        self._send(mode=MODE_MOTION, gait_id=GAIT_USER, vf=0, vl=0, vy=0,
+                   step_h=0.08, pos_z=0.12); self._pump()
 
     def slope_step_forward(self, distance=0.04, speed=0.06):
-        """斜坡防滑: WALK步态(三点支撑) + 极低重心 + 高抬腿"""
+        """斜坡防滑: 壁虎爬行步态(Z字下扎+wave gait三点支撑) + IMU力控"""
         if distance <= 0 or speed <= 0: return
         dur_ms = max(500, int(distance/(speed*MPS_PER_SEC)*1000*STEP_MARGIN))
         ticks = max(1, dur_ms * 1000 // _TICK_US)
         for _ in range(ticks):
-            # WALK步态(gait=6)始终三点着地, 比TROT稳
-            self._send(mode=MODE_LOCOMOTION, gait_id=GAIT_WALK, vf=speed,
-                       step_h=0.10, pos_z=0.06, contact=CONTACT_ALL)
+            self._send(mode=MODE_MOTION, gait_id=GAIT_USER, vf=speed,
+                       contact=CONTACT_ALL)
             self._pump(); time.sleep(_TICK_US / 1_000_000)
-        self._send(vf=0, vl=0, vy=0); self._pump()
+        self._send(mode=MODE_MOTION, gait_id=GAIT_USER, vf=0, vl=0, vy=0,
+                   contact=CONTACT_ALL); self._pump()
     def step_shift(self, distance=0.03, speed=0.05):
         if abs(distance) < 0.005: return
         vl = speed if distance > 0 else -speed
